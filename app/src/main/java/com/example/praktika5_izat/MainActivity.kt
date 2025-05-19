@@ -17,24 +17,43 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.praktika5_izat.ui.theme.Praktika5_IzatTheme // если у тебя своя тема — поправь
+import com.example.praktika5_izat.ui.theme.Praktika5_IzatTheme
+import retrofit2.Call
 
-data class Product(
-    val image: Int,
-    val name: String,
-    val price: String,
-    val description: String
-)
 
-val products = listOf(
+fun getProducts() = listOf(
     Product(R.drawable.__75, "Poco C75", "$500", "Бюджетный смартфон с хорошей камерой."),
-    Product(R.drawable.msi, "MSI Gaming laptop 2017", "$1399", "Игровой ноутбук для современных игр."),
-    Product(R.drawable.nissan_gtr_r_35, "Nissan GTR R35", "$78000", "Легендарный японский спорткар."),
-    Product(R.drawable.iphone_15, "iPhone 15 Pro Max", "$1200", "Новый флагман Apple с топовой камерой."),
-    Product(R.drawable.elitehouse, "Элитная квартира", "$25000", "Современное жильё в центре города."),
-    Product(R.drawable.nissan_skyline_gtr_r36, "Nissan Skyline R36", "$120000", "Новое поколение Skyline.")
+    Product(
+        R.drawable.msi,
+        "MSI Gaming laptop 2017",
+        "$1399",
+        "Игровой ноутбук для современных игр."
+    ),
+    Product(
+        R.drawable.nissan_gtr_r_35,
+        "Nissan GTR R35",
+        "$78000",
+        "Легендарный японский спорткар."
+    ),
+    Product(
+        R.drawable.iphone_15,
+        "iPhone 15 Pro Max",
+        "$1200",
+        "Новый флагман Apple с топовой камерой."
+    ),
+    Product(
+        R.drawable.elitehouse,
+        "Элитная квартира",
+        "$25000",
+        "Современное жильё в центре города."
+    ),
+    Product(
+        R.drawable.nissan_skyline_gtr_r36,
+        "Nissan Skyline R36",
+        "$120000",
+        "Новое поколение Skyline."
+    )
 )
 
 class MainActivity : AppCompatActivity() {
@@ -47,8 +66,19 @@ class MainActivity : AppCompatActivity() {
                     topBar = {
                         TopAppBar(
                             title = { Text("Каталог товаров", color = Color.White) },
-                            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF37474F))
+                            colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = Color(0xFF37474F))
                         )
+                    },
+                    floatingActionButton = {
+                        val context = LocalContext.current
+                        FloatingActionButton(
+                            onClick = {
+                                context.startActivity(Intent(context, SearchActivity::class.java))
+                            },
+                            containerColor = Color(0xFF37474F)
+                        ) {
+                            Text("🔍", color = Color.White)
+                        }
                     },
                     containerColor = Color(0xFFECEFF1)
                 ) { paddingValues ->
@@ -62,9 +92,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun ProductList(modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.padding(16.dp)) {
-        items(products) { product ->
-            ProductCard(product = product)
-        }
+        items(getProducts()) { product -> ProductCard(product = product) }
     }
 }
 
@@ -99,17 +127,18 @@ fun ProductCard(product: Product) {
             Column(modifier = Modifier.align(Alignment.CenterVertically)) {
                 Text(product.name, style = MaterialTheme.typography.titleMedium, color = Color(0xFF263238))
                 Text(product.price, style = MaterialTheme.typography.bodyMedium, color = Color(0xFF607D8B))
+                RetrofitInstance.api.getTodo().enqueue(object : retrofit2.Callback<Todo> {
+                    override fun onResponse(call: Call<Todo>, response: retrofit2.Response<Todo>) {
+                        if (response.isSuccessful) {
+                            val todo = response.body()
+                            println(todo)  // или обновить UI с данными
+                        }
+                    }
+                    override fun onFailure(call: Call<Todo>, t: Throwable) {
+                        t.printStackTrace()
+                    }
+                })
             }
         }
-    }
-}
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun MainActivityPreview() {
-    Praktika5_IzatTheme {
-        ProductList()
     }
 }

@@ -58,7 +58,7 @@ fun DetailsScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
+                colors = TopAppBarDefaults.largeTopAppBarColors(
                     containerColor = Color(0xFF37474F)
                 )
             )
